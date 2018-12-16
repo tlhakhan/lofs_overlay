@@ -1,5 +1,7 @@
 # lofs_overlay
   - Use case:  When you want to overlay custom config files (post-boot) from a sourced directory over / filesystem, especially for Live OS where most files are on read-only RAM disk.
+  - Requires: `SunOS` and was tested/working on `SunOS smos-02 5.11 joyent_20181206T012147Z i86pc i386 i86pc`
+  - Dependencies: Uses filesystem `lofs` to `mount -F` on the system.
 
 # Usage
   - Expects 1 string argument, either `start` or `stop`.
