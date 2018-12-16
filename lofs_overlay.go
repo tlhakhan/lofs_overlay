@@ -179,7 +179,7 @@ func start(overlayRootPath string) {
         // mount happens here, all edge cases have errored out
         _, err:= exec.Command("mount", "-F", "lofs", path, targetPath).CombinedOutput()
         if err != nil {
-          fmt.Printf("error mounting lofs for %s to target file %s", path, targetPath)
+          fmt.Printf("error mounting lofs for %s to target file %s\n", path, targetPath)
           os.Exit(1)
         }
         fmt.Printf("%s is now mounted to target file %s\n", path, targetPath)
