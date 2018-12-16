@@ -8,6 +8,10 @@
   - By default, assumes directory is `/usbkey/crud` as the sourced directory that will overlay ontop of / filesystem.
   - If a different directory is desired, use the `-overlayRootPath`.
 
+## Comments
+  - During the `stop` the process will not remove directories or 0b-size files it created.  This is to ensure softness when stopping the overlay, there is an expectation that the targetPath will eventually be removed after reboot.
+  - This will help eliminate edge cases where administrators may have created untracked files in these directories or updated the empty files.
+
 ```
 [root@smos-02 (home) /opt/lofs_overlay]# bin/SunOS/lofs_overlay -h
 Usage of bin/SunOS/lofs_overlay:
@@ -19,6 +23,8 @@ Usage: bin/SunOS/lofs_overlay start|stop
 ```
 
 # Output: start overlay
+
+## Output: start overlay when source dir doesn't exist
   - Start the overlay but `/usbkey/crud` doesn't exist.
 
 ```
@@ -27,7 +33,7 @@ start the overlay process
 /usbkey/crud does not exist, exiting..
 ```
 
-# Output: start overlay
+## Output: start overlay normally with default values
   - Starting the overlay.
 
 ```
@@ -51,7 +57,7 @@ create file is not needed on /root/.vimrc
 done linking the overlay
 ```
 
-# Output: start overlay
+## Output: start overlay on a different source root path
   - Starting the overlay on a different overlay root path (/usbkey/crud2).
 
 ```
@@ -75,7 +81,33 @@ create file is not needed on /root/.vimrc
 done linking the overlay
 ```
 
+## Output: start the overlay again
+  - Starting the overlay again, the it will not disturb already mounted targets. Idempotency guaranteed. 
+
+```
+[root@smos-02 (home) /opt/lofs_overlay]# bin/SunOS/lofs_overlay -overlayRootPath /usbkey/crud2 start
+start the overlay process
+walking dir /usbkey/crud2
+found directory /usbkey/crud2/root
+target path /root exists
+target path /root is a directory
+mkdir is not needed on /root
+found file /usbkey/crud2/root/.profile
+target path /root/.profile exists
+target path /root/.profile is a file
+create file is not needed on /root/.profile
+/usbkey/crud2/root/.profile was already mounted to target file /root/.profile
+found file /usbkey/crud2/root/.vimrc
+target path /root/.vimrc exists
+target path /root/.vimrc is a file
+create file is not needed on /root/.vimrc
+/usbkey/crud2/root/.vimrc was already mounted to target file /root/.vimrc
+done linking the overlay
+```
+
 # Output: stop overlay
+
+## Output: stop overlay initial
   - Stopping the overlay on a running system.
 
 ```
@@ -84,6 +116,23 @@ stop the overlay process
 unmounting the found target files: ["/root/.profile" "/root/.vimrc"]
 target file /root/.profile is now unmounted
 target file /root/.vimrc is now unmounted
+done unlinking the overlay
+```
+
+## Output: stop overlay multiple timse
+  - Stopping the overlay multiple times yields identical state. Idempotency guaranteed.
+
+```
+[root@smos-02 (home) /opt/lofs_overlay]# bin/SunOS/lofs_overlay -overlayRootPath /usbkey/crud2 stop
+stop the overlay process
+unmounting the found target files: ["/root/.profile" "/root/.vimrc"]
+target file /root/.profile is now unmounted
+target file /root/.vimrc is now unmounted
+done unlinking the overlay
+
+[root@smos-02 (home) /opt/lofs_overlay]# bin/SunOS/lofs_overlay -overlayRootPath /usbkey/crud2 stop
+stop the overlay process
+unmounting the found target files: []
 done unlinking the overlay
 ```
 
