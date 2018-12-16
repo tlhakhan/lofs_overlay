@@ -4,6 +4,7 @@
 mkdir -p /opt/custom/smf/share
 
 # place the lofs_overlay.xml file here
+# edit the xml file if you prefer a separate overlayRootPath directory
 touch /opt/custom/smf/lofs_overlay.xml
 
 # place the lofs_overlay binary here
